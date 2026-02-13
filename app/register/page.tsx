@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Loader2, UserPlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function RegisterPage() {
+function RegisterContent() {
     const searchParams = useSearchParams();
     const initialRole = searchParams.get("mode") === "FAMILY" ? "FAMILY" : "MOTHER";
 
@@ -121,5 +121,17 @@ export default function RegisterPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function RegisterPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <RegisterContent />
+        </Suspense>
     );
 }

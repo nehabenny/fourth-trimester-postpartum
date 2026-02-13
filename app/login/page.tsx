@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Loader2, LogIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function LoginPage() {
+function LoginContent() {
     const searchParams = useSearchParams();
     const initialMode = searchParams.get("mode") === "FAMILY" ? "FAMILY" : "MOTHER";
 
@@ -147,5 +147,17 @@ export default function LoginPage() {
                 </p>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex min-h-screen items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+        }>
+            <LoginContent />
+        </Suspense>
     );
 }
