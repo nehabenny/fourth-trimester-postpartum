@@ -41,6 +41,12 @@ export default function MotherPage() {
             timestamp: new Date().toISOString(),
         };
         localStorage.setItem("mother_log", JSON.stringify(newLog));
+
+        // Track journal history (last 5 entries) for AI sentiment pulse
+        const history = JSON.parse(localStorage.getItem("journal_history") || "[]");
+        const updatedHistory = [{ note: journalNote, timestamp: new Date().toISOString() }, ...history].slice(0, 5);
+        localStorage.setItem("journal_history", JSON.stringify(updatedHistory));
+
         setLastLog(newLog);
         alert("Daily check-in saved!");
     };

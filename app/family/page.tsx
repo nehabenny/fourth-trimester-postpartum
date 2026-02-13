@@ -1,7 +1,7 @@
 "use client";
 
 import { Info, ShieldAlert, Heart, Users, BookOpen, CheckSquare, Bell } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { CareChecklist } from "@/components/family/CareChecklist";
 import { SmartAlerts } from "@/components/family/SmartAlerts";
@@ -32,6 +32,21 @@ const awarenessCards = [
 
 export default function FamilyPage() {
     const [activeTab, setActiveTab] = useState<"alerts" | "checklist" | "learn">("alerts");
+    const [isSOS, setIsSOS] = useState(false);
+
+    useEffect(() => {
+        const checkSOS = () => {
+            const physical = localStorage.getItem("physical_status");
+            if (physical) {
+                const data = JSON.parse(physical);
+                setIsSOS(!!data.hasSilentSOS);
+            }
+        };
+        checkSOS();
+        // Listen for storage changes if they happen in another tab
+        window.addEventListener('storage', checkSOS);
+        return () => window.removeEventListener('storage', checkSOS);
+    }, []);
 
     const tabs = [
         { id: "alerts", label: "Live Alerts", icon: <ShieldAlert className="h-4 w-4" /> },
@@ -40,7 +55,10 @@ export default function FamilyPage() {
     ];
 
     return (
-        <div className="min-h-[calc(100vh-64px)] bg-muted/20">
+        <div className={cn(
+            "min-h-[calc(100vh-64px)] transition-all duration-1000",
+            isSOS ? "bg-amber-500/20 animate-pulse" : "bg-muted/20"
+        )}>
             <div className="container mx-auto flex flex-col md:flex-row gap-8 px-4 py-8">
 
                 {/* Desktop Sidebar Navigation */}

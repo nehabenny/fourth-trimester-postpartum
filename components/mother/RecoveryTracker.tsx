@@ -22,6 +22,7 @@ export function RecoveryTracker() {
         const hasFever = selectedSymptoms.includes("fever");
         const hasBleeding = selectedSymptoms.includes("bleeding");
         const hasPain = selectedSymptoms.includes("pain_c") || selectedSymptoms.includes("pain_b");
+        const isExhausted = sleepHours <= 3; // "hitting a physical limit"
 
         if (hasFever && hasBleeding && hasPain) {
             setShowUrgentAlert(true);
@@ -29,12 +30,16 @@ export function RecoveryTracker() {
             setShowUrgentAlert(false);
         }
 
+        // Silent SOS Wow: Sleep <= 3 + Any Pain
+        const hasSilentSOS = isExhausted && hasPain;
+
         // Save to localStorage specifically for Family Mode to see
         localStorage.setItem("physical_status", JSON.stringify({
             symptoms: selectedSymptoms,
             sleep: sleepHours,
             appetite,
-            isUrgent: hasFever && hasBleeding && hasPain
+            isUrgent: hasFever && hasBleeding && hasPain,
+            hasSilentSOS
         }));
     }, [selectedSymptoms, sleepHours, appetite]);
 

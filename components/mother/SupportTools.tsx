@@ -24,6 +24,7 @@ export function SupportTools() {
     }, []);
 
     useEffect(() => {
+        localStorage.setItem("is_breathing", isBreathing ? "true" : "false");
         let timer: NodeJS.Timeout;
         if (isBreathing) {
             const cycle = () => {
@@ -38,7 +39,9 @@ export function SupportTools() {
             };
             cycle();
         }
-        return () => clearTimeout(timer);
+        return () => {
+            clearTimeout(timer);
+        };
     }, [isBreathing]);
 
     return (
