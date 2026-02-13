@@ -21,31 +21,47 @@ export async function POST(req: Request) {
     try {
         const { prompt, chatHistory } = await req.json();
 
-        if (!process.env.GEMINI_API_KEY) {
+        if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "your_api_key_here") {
+            console.error("Gemini Error: API Key not configured correctly in .env.local");
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
         }
 
-        // Map history to the correct content format
-        const contents: Content[] = [
-            { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
-            ...(chatHistory || []),
-            { role: "user", parts: [{ text: prompt }] }
-        ];
+        // Prepare contents: Gemini requires alternating turns if history is provided
+        // If history is empty, we just send the user prompt
+        const contents: Content[] = [...(chatHistory || []), { role: "user", parts: [{ text: prompt }] }];
+
+        console.log("Sending request to Gemini...", { model: "gemini-2.5-flash", promptLength: prompt.length });
 
         const result = await client.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.5-flash",
             contents: contents,
             config: {
-                maxOutputTokens: 500,
+                systemInstruction: SYSTEM_PROMPT,
+                maxOutputTokens: 800,
+                temperature: 0.7,
             },
         });
 
-        // Extract text from the new SDK response structure
-        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "I'm here for you, Mama.";
+        // Extract text from the new SDK response structure (candidates array)
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "I'm right here with you, Mama.";
+
+        console.log("Gemini Response received:", { textLength: text.length });
 
         return NextResponse.json({ text });
     } catch (error: any) {
-        console.error("Gemini API Error:", error);
-        return NextResponse.json({ error: "Failed to generate response" }, { status: 500 });
+        console.error("Gemini API Error Detail:", error);
+
+        // Specific handling for Quota Exceeded
+        if (error.status === 429 || error.message?.includes("RESOURCE_EXHAUSTED")) {
+            return NextResponse.json({
+                error: "Quota Exceeded",
+                message: "The AI is taking a short nap (Daily Limit Reached). Please try again in a little while!"
+            }, { status: 429 });
+        }
+
+        return NextResponse.json({
+            error: "AI is currently resting",
+            message: error.message || "Failed to generate response"
+        }, { status: 500 });
     }
 }
