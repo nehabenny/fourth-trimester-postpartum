@@ -41,7 +41,12 @@ export default function MotherPage() {
     const [lastLog, setLastLog] = useState<any>(null);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [currentAffirmation, setCurrentAffirmation] = useState("");
+    const [careCode, setCareCode] = useState<string | null>(null);
     const router = useRouter();
+
+    useEffect(() => {
+        setCareCode(localStorage.getItem("care_code"));
+    }, []);
 
     useEffect(() => {
         if (activeTab === "daily") {
@@ -119,6 +124,21 @@ export default function MotherPage() {
                             <span className="text-sm font-medium">{tab.label}</span>
                         </button>
                     ))}
+
+                    {careCode && (
+                        <div className="mt-8 rounded-3xl bg-secondary/10 p-6 border border-secondary/20 shadow-sm">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-secondary mb-3 flex items-center gap-2">
+                                <Users className="h-3 w-3" /> Bloom Circle
+                            </h3>
+                            <div className="bg-white/80 rounded-2xl p-4 text-center border-2 border-dashed border-secondary/30">
+                                <p className="text-[10px] text-muted-foreground mb-1">Your Care Code</p>
+                                <p className="text-2xl font-mono font-bold tracking-tighter text-secondary">{careCode}</p>
+                            </div>
+                            <p className="mt-3 text-[10px] leading-relaxed text-muted-foreground italic">
+                                Share this with trusted family to link their Bloom Circle accounts.
+                            </p>
+                        </div>
+                    )}
                 </aside>
 
                 {/* Mobile Tab Navigation (Fixed at bottom or top - let's stick to sticky top for now) */}
@@ -143,9 +163,16 @@ export default function MotherPage() {
                 </nav>
 
                 <main className="flex-1 w-full max-w-2xl mx-auto md:mx-0">
-                    <div className="md:hidden mb-8 text-center pt-4">
+                    <div className="md:hidden mb-8 text-center pt-4 flex flex-col items-center">
                         <h1 className="font-serif text-3xl font-bold italic">Bloom Circle</h1>
-                        <p className="text-muted-foreground">You're doing a great job, Bloom.</p>
+                        <p className="text-muted-foreground mb-4">You're doing a great job, Bloom.</p>
+
+                        {careCode && (
+                            <div className="inline-flex items-center gap-2 rounded-2xl bg-secondary/10 px-4 py-2 border border-secondary/20 shadow-sm animate-in zoom-in-95 duration-500">
+                                <span className="text-[10px] uppercase font-bold text-secondary">Care Code:</span>
+                                <span className="font-mono font-bold text-secondary tracking-widest">{careCode}</span>
+                            </div>
+                        )}
                     </div>
 
                     <div className="pb-20">

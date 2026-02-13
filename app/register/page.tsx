@@ -15,6 +15,7 @@ function RegisterContent() {
         email: "",
         password: "",
         role: initialRole,
+        care_code: "",
     });
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
@@ -28,7 +29,8 @@ function RegisterContent() {
         try {
             const signupData = {
                 ...formData,
-                username: formData.username.toLowerCase()
+                username: formData.username.toLowerCase(),
+                care_code: formData.role === "FAMILY" ? formData.care_code : undefined
             };
 
             const response = await fetch("http://localhost:8000/api/users/register/", {
@@ -41,7 +43,7 @@ function RegisterContent() {
                 router.push(`/login?registered=true&mode=${formData.role}`);
             } else {
                 const data = await response.json();
-                setError(data.username?.[0] || data.detail || "Registration failed. Please try again.");
+                setError(data.care_code?.[0] || data.username?.[0] || data.detail || "Registration failed. Please try again.");
             }
         } catch (err) {
             setError("Something went wrong. Is the backend running?");
@@ -96,6 +98,21 @@ function RegisterContent() {
                             className="block w-full rounded-2xl border-none bg-muted/50 px-4 py-4 focus:ring-2 focus:ring-primary/20"
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                         />
+                        {formData.role === "FAMILY" && (
+                            <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                <input
+                                    type="text"
+                                    required
+                                    maxLength={6}
+                                    placeholder="Enter 6-character Care Code"
+                                    className="block w-full rounded-2xl border-none bg-secondary/10 px-4 py-4 font-mono font-bold uppercase placeholder:font-sans placeholder:font-normal focus:ring-2 focus:ring-secondary/20"
+                                    onChange={(e) => setFormData({ ...formData, care_code: e.target.value.toUpperCase() })}
+                                />
+                                <p className="mt-2 text-[10px] text-muted-foreground italic px-2">
+                                    Ask the mother for her unique Bloom Circle care code.
+                                </p>
+                            </div>
+                        )}
                     </div>
 
                     <button

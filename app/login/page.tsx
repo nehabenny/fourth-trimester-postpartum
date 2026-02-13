@@ -65,6 +65,9 @@ function LoginContent() {
                 localStorage.setItem("access_token", data.access);
                 localStorage.setItem("refresh_token", data.refresh);
                 localStorage.setItem("user_role", actualRole);
+                if (decoded.care_code) {
+                    localStorage.setItem("care_code", decoded.care_code);
+                }
 
                 if (actualRole === "MOTHER") {
                     router.push("/mother");
