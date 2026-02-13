@@ -20,6 +20,19 @@ const moods = [
     { emoji: "😍", label: "Great", bg: "bg-pink-50" },
 ];
 
+const affirmations = [
+    "You are exactly the mother your baby needs.",
+    "Be gentle with yourself; you're doing something incredible.",
+    "It's okay to ask for help; it's a sign of strength, not weakness.",
+    "Your worth is not measured by how much you get done today.",
+    "Rest is productive. Your body and mind deserve it.",
+    "You are doing a great job, even on the hardest days.",
+    "Small wins are still wins. Celebrate them.",
+    "Your baby loves you for who you are, through every mood.",
+    "You're learning and growing alongside your baby.",
+    "It's okay to take it one hour at a time."
+];
+
 export default function MotherPage() {
     const [activeTab, setActiveTab] = useState<"daily" | "physical" | "mental" | "support" | "community">("daily");
     const [selectedMood, setSelectedMood] = useState<number | null>(null);
@@ -27,7 +40,15 @@ export default function MotherPage() {
     const [journalNote, setJournalNote] = useState("");
     const [lastLog, setLastLog] = useState<any>(null);
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const [currentAffirmation, setCurrentAffirmation] = useState("");
     const router = useRouter();
+
+    useEffect(() => {
+        if (activeTab === "daily") {
+            const random = affirmations[Math.floor(Math.random() * affirmations.length)];
+            setCurrentAffirmation(random);
+        }
+    }, [activeTab]);
 
     useEffect(() => {
         const token = localStorage.getItem("access_token");
@@ -130,6 +151,17 @@ export default function MotherPage() {
                     <div className="pb-20">
                         {activeTab === "daily" && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                {currentAffirmation && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="rounded-3xl bg-secondary/10 p-6 text-center border-2 border-dashed border-secondary/20 italic text-secondary-foreground shadow-sm"
+                                    >
+                                        <Sparkles className="mx-auto mb-2 h-5 w-5 text-secondary animate-pulse" />
+                                        "{currentAffirmation}"
+                                    </motion.div>
+                                )}
+
                                 <section className="rounded-3xl border bg-card p-6 shadow-sm">
                                     <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
                                         How are you feeling?

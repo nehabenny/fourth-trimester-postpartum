@@ -17,6 +17,7 @@ interface Post {
     likes: number;
     replies: Reply[];
     timestamp: string;
+    isLiked?: boolean; // Client-side state for the current user
 }
 
 export function CommunityForum() {
@@ -28,8 +29,14 @@ export function CommunityForum() {
 
     useEffect(() => {
         const savedPosts = localStorage.getItem("community_posts");
+        const likedIds = JSON.parse(localStorage.getItem("user_liked_posts") || "[]");
+
         if (savedPosts) {
-            setPosts(JSON.parse(savedPosts));
+            const parsed = JSON.parse(savedPosts).map((p: Post) => ({
+                ...p,
+                isLiked: likedIds.includes(p.id)
+            }));
+            setPosts(parsed);
         } else {
             // Initial seed posts
             const initialPosts: Post[] = [
@@ -52,14 +59,17 @@ export function CommunityForum() {
                     timestamp: new Date(Date.now() - 7200000).toISOString()
                 }
             ];
-            setPosts(initialPosts);
+            const initialized = initialPosts.map(p => ({ ...p, isLiked: likedIds.includes(p.id) }));
+            setPosts(initialized);
             localStorage.setItem("community_posts", JSON.stringify(initialPosts));
         }
     }, []);
 
     const savePosts = (updatedPosts: Post[]) => {
+        // Strip isLiked before saving to global storage simulation
+        const toSave = updatedPosts.map(({ isLiked, ...rest }) => rest);
         setPosts(updatedPosts);
-        localStorage.setItem("community_posts", JSON.stringify(updatedPosts));
+        localStorage.setItem("community_posts", JSON.stringify(toSave));
     };
 
     const handleCreatePost = () => {
@@ -69,16 +79,32 @@ export function CommunityForum() {
             text: newPost,
             likes: 0,
             replies: [],
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            isLiked: false
         };
         savePosts([post, ...posts]);
         setNewPost("");
     };
 
     const handleLike = (postId: string) => {
-        const updated = posts.map(p =>
-            p.id === postId ? { ...p, likes: p.likes + 1 } : p
-        );
+        const likedIds = JSON.parse(localStorage.getItem("user_liked_posts") || "[]");
+        let newLikedIds = [...likedIds];
+
+        const updated = posts.map(p => {
+            if (p.id === postId) {
+                const isTogglingOff = p.isLiked;
+                if (isTogglingOff) {
+                    newLikedIds = newLikedIds.filter(id => id !== postId);
+                    return { ...p, likes: Math.max(0, p.likes - 1), isLiked: false };
+                } else {
+                    newLikedIds.push(postId);
+                    return { ...p, likes: p.likes + 1, isLiked: true };
+                }
+            }
+            return p;
+        });
+
+        localStorage.setItem("user_liked_posts", JSON.stringify(newLikedIds));
         savePosts(updated);
     };
 
@@ -165,8 +191,8 @@ export function CommunityForum() {
                                 onClick={() => handleLike(post.id)}
                                 className="flex items-center gap-2 text-xs font-bold text-muted-foreground transition-all hover:text-red-500"
                             >
-                                <Heart className={cn("h-4 w-4", post.likes > 12 ? "fill-red-500 text-red-500" : "")} />
-                                {post.likes} Cheers
+                                <Heart className={cn("h-4 w-4 transition-all", post.isLiked ? "fill-red-500 text-red-500 scale-125" : "text-muted-foreground")} />
+                                {post.likes} {post.likes === 1 ? "Cheer" : "Cheers"}
                             </button>
                             <button
                                 onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
