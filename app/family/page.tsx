@@ -62,6 +62,7 @@ export default function FamilyPage() {
         { id: "alerts", label: "Live Alerts", icon: <ShieldAlert className="h-4 w-4" /> },
         { id: "checklist", label: "Care Guide", icon: <CheckSquare className="h-4 w-4" /> },
         { id: "learn", label: "Awareness", icon: <BookOpen className="h-4 w-4" /> },
+        { id: "community", label: "Community", icon: <Users className="h-4 w-4" /> },
     ];
 
     return (
@@ -164,6 +165,19 @@ export default function FamilyPage() {
                                     <h3 className="mb-2 font-bold">More Resources Coming soon</h3>
                                     <p className="text-sm text-muted-foreground">
                                         We're building a directory of local clinics and support groups.
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === "community" && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                <h2 className="text-2xl font-bold px-2">Bloom Community</h2>
+                                <div className="rounded-3xl bg-secondary/10 p-12 text-center border-2 border-dashed border-secondary/20">
+                                    <Users className="mx-auto mb-4 h-16 w-16 text-secondary/40" />
+                                    <h3 className="text-xl font-bold mb-2">Connecting Soon</h3>
+                                    <p className="text-muted-foreground max-w-sm mx-auto">
+                                        We're building a safe space for families to share experiences and support each other.
                                     </p>
                                 </div>
                             </div>
