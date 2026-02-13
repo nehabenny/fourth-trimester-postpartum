@@ -1,73 +1,66 @@
-# Bloom: Postpartum AI Support Platform
+# 🌸 Bloom: The Future of Postpartum Support
 
-Bloom is a comprehensive digital companion designed to support mothers and their families during the critical fourth trimester. It combines AI-driven health monitoring with an anonymous community space and intelligent alerts.
+**No mother should feel alone in the Fourth Trimester.**
 
-## 🌟 Key Features
+Bloom is an innovative, AI-first sanctuary built to bridge the gap between hospital discharge and full recovery. By combining empathetic AI companions, clinical-grade visual analysis, and logic-driven family alerts, Bloom transforms the isolating experience of early motherhood into a connected, supported journey.
 
-### Mother Mode
-- **Daily Dashboard**: Personalized check-ins with random supportive affirmations.
-- **Nurse AI Health Vision**: Visual AI analysis of physical symptoms (e.g., C-section healing, breastfeeding concerns) using Gemini Pro Vision.
-- **Anonymous Community Forum**: Safe space to share, like, and reply anonymously to other mothers.
-- **Recovery Tracker**: Comprehensive tool to monitor physical and mental wellbeing.
-- **3AM AI Chat**: A 24/7 AI companion for middle-of-the-night support.
+---
 
-### Family Mode
-- **Bloom Circle Dashboard**: Real-time alerts and awareness for support partners.
-- **Smart Alerts**: Logic-driven alerts for physical pain, mood dips, and vital symptoms.
-- **Care Guide & Checklist**: Actionable steps for support partners to help the mother thrive.
-- **SOS Monitoring**: Passive monitoring for silent distress signals.
+## 🚀 The Innovation: Why Bloom Matters
 
-## 🏗️ Architecture
+The "Fourth Trimester" is often a period of extreme physical and emotional vulnerability. Bloom addresses three critical pillars of recovery:
 
-- **Frontend**: [Next.js](https://nextjs.org/) (React, Tailwind CSS, Framer Motion)
-- **Backend**: [Django REST Framework](https://www.django-rest-framework.org/) (SQLite, SimpleJWT)
-- **AI Integration**: [Google Gemini Pro Vision](https://ai.google.dev/) for health analysis and chat.
+1.  **Passive Visibility**: Family members aren't just "helping"—they are *aware* through logic-driven alerts.
+2.  **Clinical Guidance at Home**: Our **Nurse AI Vision** provides instant, non-invasive feedback on recovery milestones.
+3.  **Empathetic Resilience**: The **3AM Companion** ensures that no mother faces the loneliness of a middle-of-the-night feeding without a supportive voice.
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-- Node.js (v18+)
-- Python (v3.10+)
-- Gemini API Key
+## 🌟 The Experience: Dual-Mode Ecosystem
 
-### Backend Setup
-1. Navigate to the `backend` directory:
-   ```bash
-   cd backend
-   ```
-2. Create and activate a virtual environment:
-   ```bash
-   python -m venv .venv
-   .venv\Scripts\activate  # Windows
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Run migrations:
-   ```bash
-   python manage.py migrate
-   ```
-5. Start the server:
-   ```bash
-   python manage.py runserver 8000
-   ```
+### 🤱 The Mother's Sanctuary (Bloom Mode)
+*Focus: Recovery, Mindfulness, and Secure Connection.*
+- **Daily Reflection & Affirmations**: A personalized dashboard that validates her strength through every mood swing.
+- **Nurse AI Vision**: Snap a photo. Get a professional, empathetic analysis of nutrition or fatigue. No more frantic Googling.
+- **3AM AI Companion**: A gentle, wise voice available at the hardest hours, normalizing exhaustion and offering "Mama-first" support.
+- **The Sanctuary Forum**: A completely anonymous, category-based community for sharing the raw, unfiltered reality of recovery.
 
-### Frontend Setup
-1. Navigate to the root directory.
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Configure environment variables in `.env.local`:
-   ```bash
-   GEMINI_API_KEY=your_key_here
-   ```
-4. Start the development server:
-   ```bash
-   npm run dev
-   ```
-5. Open [http://localhost:3000](http://localhost:3000) for Mother Mode or [http://localhost:3000/family](http://localhost:3000/family) for Family Mode.
+### 🛡️ The Family's Awareness (Bloom Circle)
+*Focus: Actionable Support, Early Detection, and Proactive Love.*
+- **Smart Alerts**: A sophisticated logic engine that flags **Silent SOS** signals (extreme fatigue + active pain) and **Mood Dips**.
+- **Proactive Reminders**: The "Bloom Circle" doesn't ask "How can I help?"—the app *tells* them precisely what is needed, from baby duty to hydration.
+- **Guided Awareness**: Curated insights on PPD, hormonal shifts, and red flags, turning family members into expert support partners.
 
-## 🔒 Security
-Bloom uses JWT-based authentication to separate Mother and Family access, ensuring privacy and focused support.
+---
+
+## 🛠️ Technical Excellence
+
+Bloom is built for stability, privacy, and speed.
+
+- **Frontend**: `Next.js 14` with `Framer Motion` for premium, fluid micro-animations.
+- **Backend**: `Django REST Framework` with `SimpleJWT` for military-grade data separation.
+- **Intelligence Layer**: Powered by `Google Gemini 2.5 Flash` for lightning-fast, empathetic multimodal analysis.
+- **Real-Time Loop**: Cross-account communication via `Supabase` and intelligent `localStorage` state-syncing.
+- **Stability Architecture**: Custom fallback layers ensure the app remains functional and supportive even during API surges.
+
+---
+
+## 🛣️ The Roadmap: What's Next
+- **Clinic Integration**: One-click sharing of Nurse AI logs with a mother's OB/GYN.
+- **Predictive Analytics**: Early-warning systems for PPD risk based on 14-day sentiment trends.
+- **Bloom Directory**: A geolocation-based map of local lactation consultants and support groups.
+
+---
+
+## 🔓 Getting Started
+
+### Quick Start (Dev Mode)
+1. **Clone & Install**: `git clone https://github.com/nehabenny/postpartum-ai`
+2. **Setup Env**: Add `GEMINI_API_KEY` to `.env.local`
+3. **Launch**: `npm run dev` & `python manage.py runserver 8000`
+
+---
+
+**Built with ❤️ for every mother who needs a sanctuary.**
+
+*Bloom is a support tool and should never replace professional medical advice.*
