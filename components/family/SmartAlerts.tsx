@@ -186,7 +186,9 @@ export function SmartAlerts() {
                 type: "CAUTION",
                 level: "yellow",
                 title: "Mood Dip Noted",
-                message: "She's logged a low mood. She needs a little extra love today.",
+                message: motherLog.note
+                    ? `She's feeling low today. She shared: "${motherLog.note}"`
+                    : "She's logged a low mood. She needs a little extra love today.",
                 suggestions: ["Make her favorite tea", "Take the baby for a 30m walk", "Offer a warm bath"],
                 icon: <Info className="h-6 w-6" />,
             };

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Smile, HeartPulse, ClipboardCheck, Sparkles, MessageSquare, X, Users } from "lucide-react";
+import { Smile, HeartPulse, ClipboardCheck, Sparkles, MessageSquare, X, Users, Heart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { RecoveryTracker } from "@/components/mother/RecoveryTracker";
@@ -42,6 +42,7 @@ export default function MotherPage() {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [currentAffirmation, setCurrentAffirmation] = useState("");
     const [careCode, setCareCode] = useState<string | null>(null);
+    const [notification, setNotification] = useState<any>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -62,6 +63,35 @@ export default function MotherPage() {
             router.push("/login?error=unauthorized");
         }
     }, [router]);
+
+    useEffect(() => {
+        const checkNotifications = () => {
+            const saved = localStorage.getItem("bloom_notifications");
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed.length > 0) {
+                    setNotification(parsed[0]);
+                } else {
+                    setNotification(null);
+                }
+            }
+        };
+
+        checkNotifications();
+        window.addEventListener("storage", checkNotifications);
+        const interval = setInterval(checkNotifications, 3000);
+        return () => {
+            window.removeEventListener("storage", checkNotifications);
+            clearInterval(interval);
+        };
+    }, []);
+
+    const dismissNotification = () => {
+        const saved = JSON.parse(localStorage.getItem("bloom_notifications") || "[]");
+        saved.shift();
+        localStorage.setItem("bloom_notifications", JSON.stringify(saved));
+        setNotification(null);
+    };
 
     useEffect(() => {
         const saved = localStorage.getItem("mother_log");
@@ -141,7 +171,7 @@ export default function MotherPage() {
                     )}
                 </aside>
 
-                {/* Mobile Tab Navigation (Fixed at bottom or top - let's stick to sticky top for now) */}
+                {/* Mobile Tab Navigation */}
                 <nav className="md:hidden sticky top-16 z-40 flex w-full border-b bg-background/80 px-2 py-2 backdrop-blur-md">
                     <div className="flex w-full justify-around">
                         {tabs.map((tab) => (
@@ -176,6 +206,32 @@ export default function MotherPage() {
                     </div>
 
                     <div className="pb-20">
+                        <AnimatePresence>
+                            {notification && (
+                                <motion.div
+                                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                    className="mb-6 overflow-hidden rounded-3xl border-2 border-primary bg-primary text-primary-foreground shadow-2xl shadow-primary/30"
+                                >
+                                    <div className="flex items-center justify-between bg-white/10 px-6 py-3">
+                                        <div className="flex items-center gap-2">
+                                            <Heart className="h-4 w-4 fill-current" />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">Love from Bloom Circle</span>
+                                        </div>
+                                        <button onClick={dismissNotification} className="rounded-full bg-white/20 p-1 hover:bg-white/30">
+                                            <X className="h-3 w-3" />
+                                        </button>
+                                    </div>
+                                    <div className="p-6">
+                                        <p className="text-lg font-medium leading-relaxed italic">
+                                            "{notification.text}"
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+
                         {activeTab === "daily" && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
                                 {currentAffirmation && (
@@ -210,8 +266,6 @@ export default function MotherPage() {
                                     </div>
                                 </section>
 
-                                <CameraCapture />
-
                                 <section className="rounded-3xl border bg-card p-6 shadow-sm">
                                     <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">
                                         Daily Reflection
@@ -240,7 +294,8 @@ export default function MotherPage() {
                         )}
 
                         {activeTab === "physical" && (
-                            <div className="animate-in fade-in slide-in-from-bottom-4">
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                <CameraCapture />
                                 <RecoveryTracker />
                             </div>
                         )}
