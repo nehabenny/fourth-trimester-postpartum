@@ -157,25 +157,6 @@ export function CommunityForum() {
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            {/* Category Filter Bar */}
-            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
-                {CATEGORIES.map((cat) => (
-                    <button
-                        key={cat.id}
-                        onClick={() => setFilterCategory(cat.id)}
-                        className={cn(
-                            "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all",
-                            filterCategory === cat.id
-                                ? "bg-primary text-primary-foreground shadow-md"
-                                : "bg-white border text-muted-foreground hover:bg-muted/50"
-                        )}
-                    >
-                        {cat.icon}
-                        {cat.label}
-                    </button>
-                ))}
-            </div>
-
             {/* Create Post Section */}
             <section className="rounded-3xl border bg-card p-6 shadow-sm ring-1 ring-primary/5">
                 <div className="mb-4 flex items-center justify-between">
