@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, ShieldAlert, Heart, Users, BookOpen, CheckSquare, Bell } from "lucide-react";
+import { Info, ShieldAlert, Heart, Users, BookOpen, CheckSquare, Bell, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -64,6 +64,11 @@ export default function FamilyPage() {
         { id: "learn", label: "Awareness", icon: <BookOpen className="h-4 w-4" /> },
     ];
 
+    const handleLogout = () => {
+        localStorage.clear();
+        router.push("/login");
+    };
+
     return (
         <div className={cn(
             "min-h-[calc(100vh-64px)] transition-all duration-1000",
@@ -94,6 +99,18 @@ export default function FamilyPage() {
                             <span className="text-sm font-medium">{tab.label}</span>
                         </button>
                     ))}
+
+                    <div className="mt-auto pt-8">
+                        <button
+                            onClick={handleLogout}
+                            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-red-500 transition-all hover:bg-red-50 font-medium"
+                        >
+                            <div className="rounded-lg bg-red-100 p-1.5">
+                                <LogOut className="h-4 w-4" />
+                            </div>
+                            <span>Logout</span>
+                        </button>
+                    </div>
                 </aside>
 
                 {/* Mobile Tab Navigation */}

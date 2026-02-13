@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Smile, HeartPulse, ClipboardCheck, Sparkles, MessageSquare, X, Users, Heart } from "lucide-react";
+import { Smile, HeartPulse, ClipboardCheck, Sparkles, MessageSquare, X, Users, Heart, LogOut } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { RecoveryTracker } from "@/components/mother/RecoveryTracker";
@@ -119,6 +119,11 @@ export default function MotherPage() {
         alert("Daily check-in saved!");
     };
 
+    const handleLogout = () => {
+        localStorage.clear();
+        router.push("/login");
+    };
+
     const tabs = [
         { id: "daily", label: "Daily", icon: <Smile className="h-4 w-4" /> },
         { id: "physical", label: "Physical", icon: <HeartPulse className="h-4 w-4" /> },
@@ -169,6 +174,18 @@ export default function MotherPage() {
                             </p>
                         </div>
                     )}
+
+                    <div className="mt-auto pt-8">
+                        <button
+                            onClick={handleLogout}
+                            className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-red-500 transition-all hover:bg-red-50 font-medium"
+                        >
+                            <div className="rounded-lg bg-red-100 p-1.5">
+                                <LogOut className="h-4 w-4" />
+                            </div>
+                            <span>Logout</span>
+                        </button>
+                    </div>
                 </aside>
 
                 {/* Mobile Tab Navigation */}

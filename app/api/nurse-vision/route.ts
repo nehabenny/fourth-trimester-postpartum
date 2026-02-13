@@ -111,6 +111,10 @@ export async function POST(req: Request) {
         return NextResponse.json(analysis);
     } catch (error: any) {
         console.error("Nurse Vision Error:", error);
-        return NextResponse.json({ error: "Nurse is currently busy: " + error.message }, { status: 500 });
+        return NextResponse.json({
+            error: "Nurse is taking a break",
+            ai_insight_text: "The Nurse is taking a 60-second break to check on other patients... You're doing great. Take a deep breath while I process your data.",
+            alert_level: "stable"
+        }, { status: 500 });
     }
 }

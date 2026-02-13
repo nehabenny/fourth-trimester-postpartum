@@ -51,17 +51,19 @@ export async function POST(req: Request) {
     } catch (error: any) {
         console.error("Gemini API Error Detail:", error);
 
+        const fallback = "The Nurse is taking a 60-second break to check on other patients... You're doing great. Take a deep breath while I process your data.";
+
         // Specific handling for Quota Exceeded
         if (error.status === 429 || error.message?.includes("RESOURCE_EXHAUSTED")) {
             return NextResponse.json({
                 error: "Quota Exceeded",
-                message: "The AI is taking a short nap (Daily Limit Reached). Please try again in a little while!"
+                text: fallback
             }, { status: 429 });
         }
 
         return NextResponse.json({
             error: "AI is currently resting",
-            message: error.message || "Failed to generate response"
+            text: fallback
         }, { status: 500 });
     }
 }
