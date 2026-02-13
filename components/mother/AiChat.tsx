@@ -41,8 +41,15 @@ export function AiChat({ onClose }: { onClose?: () => void }) {
             });
 
             const data = await response.json();
-            if (data.text) {
+
+            if (response.ok && data.text) {
                 setMessages((prev) => [...prev, { role: "model", parts: [{ text: data.text }] }]);
+            } else {
+                const errorMsg = data.error === "API Key not configured"
+                    ? "Mama, it looks like the AI companion needs its key (API Key) to wake up. Check the .env.local file."
+                    : (data.message || "I'm having a little trouble connecting right now, Mama.");
+
+                setMessages((prev) => [...prev, { role: "model", parts: [{ text: errorMsg }] }]);
             }
         } catch (error) {
             console.error("Chat Error:", error);
