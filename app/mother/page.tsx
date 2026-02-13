@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Smile, HeartPulse, ClipboardCheck, Sparkles, MessageSquare, X } from "lucide-react";
+import { Smile, HeartPulse, ClipboardCheck, Sparkles, MessageSquare, X, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { RecoveryTracker } from "@/components/mother/RecoveryTracker";
@@ -9,6 +9,7 @@ import { MentalHealthScreening } from "@/components/mother/MentalHealthScreening
 import { SupportTools } from "@/components/mother/SupportTools";
 import { AiChat } from "@/components/mother/AiChat";
 import { CameraCapture } from "@/components/mother/CameraCapture";
+import { CommunityForum } from "@/components/mother/CommunityForum";
 import { AnimatePresence, motion } from "framer-motion";
 
 const moods = [
@@ -20,7 +21,7 @@ const moods = [
 ];
 
 export default function MotherPage() {
-    const [activeTab, setActiveTab] = useState<"daily" | "physical" | "mental" | "support">("daily");
+    const [activeTab, setActiveTab] = useState<"daily" | "physical" | "mental" | "support" | "community">("daily");
     const [selectedMood, setSelectedMood] = useState<number | null>(null);
     const [stressLevel, setStressLevel] = useState(3);
     const [journalNote, setJournalNote] = useState("");
@@ -67,6 +68,7 @@ export default function MotherPage() {
         { id: "physical", label: "Physical", icon: <HeartPulse className="h-4 w-4" /> },
         { id: "mental", label: "Wellness", icon: <ClipboardCheck className="h-4 w-4" /> },
         { id: "support", label: "Support", icon: <Sparkles className="h-4 w-4" /> },
+        { id: "community", label: "Community", icon: <Users className="h-4 w-4" /> },
     ];
 
     return (
@@ -193,6 +195,12 @@ export default function MotherPage() {
                         {activeTab === "support" && (
                             <div className="animate-in fade-in slide-in-from-bottom-4">
                                 <SupportTools />
+                            </div>
+                        )}
+
+                        {activeTab === "community" && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4">
+                                <CommunityForum />
                             </div>
                         )}
                     </div>
