@@ -2,6 +2,7 @@
 
 import { Info, ShieldAlert, Heart, Users, BookOpen, CheckSquare, Bell } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { CareChecklist } from "@/components/family/CareChecklist";
 import { SmartAlerts } from "@/components/family/SmartAlerts";
@@ -31,8 +32,17 @@ const awarenessCards = [
 ];
 
 export default function FamilyPage() {
-    const [activeTab, setActiveTab] = useState<"alerts" | "checklist" | "learn">("alerts");
+    const [activeTab, setActiveTab] = useState<"alerts" | "checklist" | "learn" | "community">("alerts");
     const [isSOS, setIsSOS] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        const role = localStorage.getItem("user_role");
+        if (!token || role !== "FAMILY") {
+            router.push("/login?error=unauthorized");
+        }
+    }, [router]);
 
     useEffect(() => {
         const checkSOS = () => {

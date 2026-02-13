@@ -7,6 +7,7 @@ import { RecoveryTracker } from "@/components/mother/RecoveryTracker";
 import { MentalHealthScreening } from "@/components/mother/MentalHealthScreening";
 import { SupportTools } from "@/components/mother/SupportTools";
 import { AiChat } from "@/components/mother/AiChat";
+import { CameraCapture } from "@/components/mother/CameraCapture";
 import { AnimatePresence, motion } from "framer-motion";
 
 const moods = [
@@ -137,6 +138,8 @@ export default function MotherPage() {
                                         ))}
                                     </div>
                                 </section>
+
+                                <CameraCapture />
 
                                 <section className="rounded-3xl border bg-card p-6 shadow-sm">
                                     <h2 className="mb-4 flex items-center gap-2 text-xl font-semibold">

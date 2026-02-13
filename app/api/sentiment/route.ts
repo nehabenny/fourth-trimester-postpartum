@@ -29,7 +29,7 @@ export async function POST(req: Request) {
         const contents = [{ role: "user", parts: [{ text: promptText }] }];
 
         const result = await client.models.generateContent({
-            model: "gemini-1.5-flash",
+            model: "gemini-2.5-flash",
             contents: contents,
             config: {
                 responseMimeType: "application/json",

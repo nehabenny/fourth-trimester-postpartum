@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AlertCircle, AlertTriangle, CheckCircle, Info, Heart, Sparkles, Wind } from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle, Info, Heart, Sparkles, Wind, Camera, HeartPulse } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 export function SmartAlerts() {
     const [motherLog, setMotherLog] = useState<any>(null);
@@ -11,28 +12,57 @@ export function SmartAlerts() {
     const [sentimentPulse, setSentimentPulse] = useState<any>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [isBreathing, setIsBreathing] = useState(false);
+    const [nurseLog, setNurseLog] = useState<any>(null);
 
     useEffect(() => {
         const updateStates = () => {
-            const log = localStorage.getItem("mother_log");
-            const physical = localStorage.getItem("physical_status");
-            const mental = localStorage.getItem("mental_health_score");
-            const history = localStorage.getItem("journal_history");
-            const breathing = localStorage.getItem("is_breathing");
+            try {
+                const log = localStorage.getItem("mother_log");
+                const physical = localStorage.getItem("physical_status");
+                const mental = localStorage.getItem("mental_health_score");
+                const history = localStorage.getItem("journal_history");
+                const breathing = localStorage.getItem("is_breathing");
 
-            if (log) setMotherLog(JSON.parse(log));
-            if (physical) setPhysicalStatus(JSON.parse(physical));
-            if (mental) setMentalScore(parseInt(mental));
-            setIsBreathing(breathing === "true");
+                if (log) setMotherLog(JSON.parse(log));
+                if (physical) setPhysicalStatus(JSON.parse(physical));
+                if (mental) setMentalScore(parseInt(mental));
+                setIsBreathing(breathing === "true");
 
-            if (history && !sentimentPulse && !isAnalyzing) {
-                analyzeSentiment(JSON.parse(history));
+                if (history && !sentimentPulse && !isAnalyzing) {
+                    analyzeSentiment(JSON.parse(history));
+                }
+            } catch (e) {
+                console.error("Error updating states from storage", e);
+            }
+        };
+
+        const fetchNurseLogs = async () => {
+            const { data, error } = await supabase
+                .from('daily_logs')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+            if (data && !error) {
+                setNurseLog(data);
             }
         };
 
         updateStates();
+        fetchNurseLogs();
+
+        // Sync every 3 seconds to catch changes in the same tab or other tabs
+        const interval = setInterval(() => {
+            updateStates();
+            fetchNurseLogs();
+        }, 3000);
+
         window.addEventListener("storage", updateStates);
-        return () => window.removeEventListener("storage", updateStates);
+        return () => {
+            window.removeEventListener("storage", updateStates);
+            clearInterval(interval);
+        };
     }, [sentimentPulse, isAnalyzing]);
 
     const analyzeSentiment = async (history: any[]) => {
@@ -55,35 +85,78 @@ export function SmartAlerts() {
     };
 
     const getAlert = () => {
-        // 0. Silent SOS (Wow Feature) - Sleep <= 3 + Pain
-        if (physicalStatus?.hasSilentSOS) {
+        const symptoms = physicalStatus?.symptoms || [];
+        const hasFever = symptoms.includes("fever");
+        const hasBleeding = symptoms.includes("bleeding");
+        const hasPain = symptoms.includes("pain_c") || symptoms.includes("pain_b");
+
+        // Priority -1. Nurse AI Urgent/Caution
+        if (nurseLog?.alert_level === 'urgent' || nurseLog?.alert_level === 'caution') {
             return {
-                type: "ACTION REQUIRED",
-                level: "amber",
-                title: "Silent SOS: Physical Limit Reached",
-                message: "Mom is hitting a severe physical limit (extreme exhaustion + pain).",
-                suggestions: [
-                    "Take the baby for 2+ hours immediately",
-                    "Ensure she reaches REM sleep",
-                    "Do not wake her for anything non-emergency"
-                ],
+                type: nurseLog.alert_level.toUpperCase(),
+                level: nurseLog.alert_level === 'urgent' ? 'red' : 'amber',
+                title: nurseLog.ai_analysis_type === 'exhaustion' ? "High Fatigue Detected" : "Nutritional Alert",
+                message: nurseLog.ai_insight_text,
+                suggestions: nurseLog.ai_analysis_type === 'exhaustion'
+                    ? ["Take over the next feed", "Let her sleep for 4+ hours", "Monitor for burnout"]
+                    : ["Ensure she eats her meal", "Hydrate her", "Check if she needs more iron"],
                 icon: <AlertTriangle className="h-6 w-6" />,
             };
         }
 
-        // 1. URGENT Physical Red Flag
+        // 0. URGENT Physical Red Flag (Fever + Bleeding + Pain)
         if (physicalStatus?.isUrgent) {
             return {
                 type: "URGENT",
                 level: "red",
                 title: "Immediate Action Required",
-                message: "Severe physical symptoms logged (fever + bleeding + pain). Please seek medical help now.",
-                suggestions: ["Call her doctor", "Ensure she is resting", "Take over all baby duties"],
+                message: "Severe physical symptoms logged together (fever, bleeding, and pain).",
+                suggestions: ["Call her doctor immediately", "Ensure she is resting", "Take over all duties"],
                 icon: <AlertCircle className="h-6 w-6" />,
             };
         }
 
-        // 2. High Emotional Distress
+        // 0.5 Silent SOS (Wow Feature) - Sleep <= 3 + Pain
+        if (physicalStatus?.hasSilentSOS) {
+            return {
+                type: "ACTION REQUIRED",
+                level: "amber",
+                title: "Silent SOS: Physical Limit",
+                message: "Mom is hitting a severe physical limit (extreme exhaustion + active pain).",
+                suggestions: [
+                    "Take the baby for 2+ hours immediately",
+                    "Ensure she reaches REM sleep",
+                    "Do not wake her for anything"
+                ],
+                icon: <AlertTriangle className="h-6 w-6" />,
+            };
+        }
+
+        // NEW 1. Independent Fever or Bleeding Alert
+        if (hasFever || hasBleeding) {
+            return {
+                type: "MEDICAL CAUTION",
+                level: "amber",
+                title: hasFever ? "Fever Detected" : "Excess Bleeding Noted",
+                message: "A significant postpartum red flag symptom was logged. Monitor closely.",
+                suggestions: ["Consult her discharge instructions", "Check her temperature again in 1hr", "Ensure she is hydrated"],
+                icon: <AlertCircle className="h-6 w-6" />,
+            };
+        }
+
+        // NEW 2. Independent Pain Alert
+        if (hasPain) {
+            return {
+                type: "PAIN MANAGEMENT",
+                level: "amber",
+                title: "Active Pain Logged",
+                message: "She is experiencing significant physical pain (C-section or Breast).",
+                suggestions: ["Prep a heating pad or ice pack", "Check her medication schedule", "Bring her a glass of water"],
+                icon: <HeartPulse className="h-6 w-6" />,
+            };
+        }
+
+        // 3. High Emotional Distress (PPD Screening)
         if (mentalScore && mentalScore >= 11) {
             return {
                 type: "HIGH SUPPORT",
@@ -95,24 +168,36 @@ export function SmartAlerts() {
             };
         }
 
-        // 3. Low Mood Alert
+        // NEW 4. Appetite Alert
+        if (physicalStatus?.appetite === "None" || physicalStatus?.appetite === "Low") {
+            return {
+                type: "NUTRITION",
+                level: "yellow",
+                title: "Low Appetite Noted",
+                message: "She isn't eating much today. Recovery requires fuel.",
+                suggestions: ["Bring her small, nutrient-dense snacks", "Make her a protein smoothie", "Ensure she has easy-to-reach food"],
+                icon: <Info className="h-6 w-6" />,
+            };
+        }
+
+        // 5. Mood Alert (Fixed logic: if mood is great/good, it shouldn't show)
         if (motherLog && (motherLog.mood === 0 || motherLog.mood === 1)) {
             return {
                 type: "CAUTION",
                 level: "yellow",
                 title: "Mood Dip Noted",
-                message: "She's logged a low or very low mood today. Keep a close eye on her.",
+                message: "She's logged a low mood. She needs a little extra love today.",
                 suggestions: ["Make her favorite tea", "Take the baby for a 30m walk", "Offer a warm bath"],
                 icon: <Info className="h-6 w-6" />,
             };
         }
 
-        // 4. Normal / Good
+        // 6. Normal / Good
         return {
             type: "STABLE",
             level: "green",
             title: "Doing Well",
-            message: "Things seem stable today! Keep up the great support.",
+            message: "Everything looks stable! She's doing an amazing job, and so are you.",
             suggestions: ["Tell her she's a great mom", "Prepare a healthy snack"],
             icon: <CheckCircle className="h-6 w-6" />,
         };
@@ -212,6 +297,41 @@ export function SmartAlerts() {
                                 <p className="text-muted-foreground">{sentimentPulse.suggested_intervention}</p>
                             </div>
                         </div>
+                    </div>
+                )}
+
+                {/* AI Nurse Vision (Wow Feature 4) */}
+                {nurseLog && (
+                    <div className="mt-4 rounded-2xl border-2 border-dashed border-indigo-500/20 bg-indigo-500/5 p-5 animate-in fade-in slide-in-from-top-4 duration-700">
+                        {console.log("SmartAlerts: Rendering Nurse Log:", nurseLog)}
+                        <div className="mb-4 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Camera className="h-4 w-4 text-indigo-500" />
+                                <h3 className="text-sm font-bold uppercase tracking-wider text-indigo-900">Nurse AI Vision</h3>
+                            </div>
+                            <span className="text-[10px] font-bold uppercase text-indigo-500/60">
+                                {new Date(nurseLog.created_at).toLocaleTimeString()}
+                            </span>
+                        </div>
+
+                        <p className="mb-4 text-sm font-medium leading-relaxed italic text-indigo-900/80">
+                            "{nurseLog.ai_insight_text || "Analysis complete. Click for more details."}"
+                        </p>
+
+                        {nurseLog.fatigue_index && (
+                            <div className="flex items-center gap-2">
+                                <div className="h-1.5 flex-1 rounded-full bg-indigo-100 overflow-hidden">
+                                    <div
+                                        className={cn(
+                                            "h-full transition-all duration-1000",
+                                            nurseLog.fatigue_index > 7 ? "bg-red-500" : "bg-indigo-500"
+                                        )}
+                                        style={{ width: `${nurseLog.fatigue_index * 10}%` }}
+                                    />
+                                </div>
+                                <span className="text-[10px] font-bold text-indigo-500">Fatigue Index: {nurseLog.fatigue_index}/10</span>
+                            </div>
+                        )}
                     </div>
                 )}
             </div>
