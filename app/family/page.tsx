@@ -169,6 +169,31 @@ export default function FamilyPage() {
                                 </div>
                             </div>
                         )}
+
+                        {activeTab === "community" && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                                <div className="rounded-3xl bg-gradient-to-br from-secondary/20 to-secondary/5 p-8 text-center border-2 border-secondary/20 shadow-xl">
+                                    <Users className="mx-auto mb-6 h-16 w-16 text-secondary animate-pulse" />
+                                    <h2 className="text-2xl font-bold mb-4">Bloom Circle Community</h2>
+                                    <p className="text-muted-foreground mb-8 leading-relaxed">
+                                        Connect with other Bloom Circles, share experiences, and find local support groups in your neighborhood.
+                                    </p>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-white/50 p-4 rounded-2xl border border-secondary/10">
+                                            <p className="text-lg font-bold text-secondary">12+</p>
+                                            <p className="text-[10px] uppercase font-bold text-muted-foreground">Local Circles</p>
+                                        </div>
+                                        <div className="bg-white/50 p-4 rounded-2xl border border-secondary/10">
+                                            <p className="text-lg font-bold text-secondary">Coming Soon</p>
+                                            <p className="text-[10px] uppercase font-bold text-muted-foreground">Peer Chat</p>
+                                        </div>
+                                    </div>
+                                    <button className="mt-8 w-full bg-secondary text-secondary-foreground py-4 rounded-2xl font-bold shadow-lg hover:opacity-90 transition-all">
+                                        Join Waiting List
+                                    </button>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </main>
             </div>
