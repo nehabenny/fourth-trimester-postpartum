@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -25,18 +26,14 @@ export default function RootLayout({
           playfair.variable
         )}
       >
-        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        {/* Only show header on non-portal pages if desired, or keep it minimal */}
+        <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm">
           <div className="container mx-auto flex h-16 items-center justify-between px-4">
             <div className="flex items-center gap-2">
-              <span className="font-serif text-xl font-bold text-primary-foreground">
-                Fourth Trimester
-              </span>
+              <Link href="/" className="font-serif text-2xl font-bold text-primary transition-opacity hover:opacity-80">
+                Bloom
+              </Link>
             </div>
-            <nav className="flex items-center gap-6">
-              <a href="/" className="text-sm font-medium hover:text-primary transition-colors">Home</a>
-              <a href="/mother" className="text-sm font-medium hover:text-primary transition-colors">Mother Mode</a>
-              <a href="/family" className="text-sm font-medium hover:text-primary transition-colors">Family Mode</a>
-            </nav>
           </div>
         </header>
         <main>{children}</main>

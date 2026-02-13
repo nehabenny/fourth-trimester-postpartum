@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Smile, HeartPulse, ClipboardCheck, Sparkles, MessageSquare, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { RecoveryTracker } from "@/components/mother/RecoveryTracker";
 import { MentalHealthScreening } from "@/components/mother/MentalHealthScreening";
@@ -24,6 +25,15 @@ export default function MotherPage() {
     const [journalNote, setJournalNote] = useState("");
     const [lastLog, setLastLog] = useState<any>(null);
     const [isChatOpen, setIsChatOpen] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        const role = localStorage.getItem("user_role");
+        if (!token || role !== "MOTHER") {
+            router.push("/login?error=unauthorized");
+        }
+    }, [router]);
 
     useEffect(() => {
         const saved = localStorage.getItem("mother_log");
@@ -65,8 +75,8 @@ export default function MotherPage() {
                 {/* Desktop Sidebar Navigation */}
                 <aside className="hidden md:flex w-64 shrink-0 flex-col gap-2">
                     <div className="mb-6 px-4">
-                        <h1 className="font-serif text-2xl font-bold italic">Mother Mode</h1>
-                        <p className="text-xs text-muted-foreground italic">You're doing great, Mama.</p>
+                        <h1 className="font-serif text-2xl font-bold italic">Bloom Mode</h1>
+                        <p className="text-xs text-muted-foreground italic">You're doing great, Bloom.</p>
                     </div>
                     {tabs.map((tab) => (
                         <button
@@ -110,8 +120,8 @@ export default function MotherPage() {
 
                 <main className="flex-1 w-full max-w-2xl mx-auto md:mx-0">
                     <div className="md:hidden mb-8 text-center pt-4">
-                        <h1 className="font-serif text-3xl font-bold italic">Fourth Trimester</h1>
-                        <p className="text-muted-foreground">You're doing a great job, Mama.</p>
+                        <h1 className="font-serif text-3xl font-bold italic">Bloom Circle</h1>
+                        <p className="text-muted-foreground">You're doing a great job, Bloom.</p>
                     </div>
 
                     <div className="pb-20">

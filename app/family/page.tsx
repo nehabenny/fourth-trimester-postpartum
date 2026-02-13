@@ -2,6 +2,7 @@
 
 import { Info, ShieldAlert, Heart, Users, BookOpen, CheckSquare, Bell } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { CareChecklist } from "@/components/family/CareChecklist";
 import { SmartAlerts } from "@/components/family/SmartAlerts";
@@ -31,8 +32,17 @@ const awarenessCards = [
 ];
 
 export default function FamilyPage() {
-    const [activeTab, setActiveTab] = useState<"alerts" | "checklist" | "learn">("alerts");
+    const [activeTab, setActiveTab] = useState<"alerts" | "checklist" | "learn" | "community">("alerts");
     const [isSOS, setIsSOS] = useState(false);
+    const router = useRouter();
+
+    useEffect(() => {
+        const token = localStorage.getItem("access_token");
+        const role = localStorage.getItem("user_role");
+        if (!token || role !== "FAMILY") {
+            router.push("/login?error=unauthorized");
+        }
+    }, [router]);
 
     useEffect(() => {
         const checkSOS = () => {
@@ -52,6 +62,7 @@ export default function FamilyPage() {
         { id: "alerts", label: "Live Alerts", icon: <ShieldAlert className="h-4 w-4" /> },
         { id: "checklist", label: "Care Guide", icon: <CheckSquare className="h-4 w-4" /> },
         { id: "learn", label: "Awareness", icon: <BookOpen className="h-4 w-4" /> },
+        { id: "community", label: "Community", icon: <Users className="h-4 w-4" /> },
     ];
 
     return (
@@ -64,7 +75,7 @@ export default function FamilyPage() {
                 {/* Desktop Sidebar Navigation */}
                 <aside className="hidden md:flex w-64 shrink-0 flex-col gap-2">
                     <div className="mb-6 px-4">
-                        <h1 className="font-serif text-2xl font-bold italic text-secondary-foreground">Family Circle</h1>
+                        <h1 className="font-serif text-2xl font-bold italic text-secondary-foreground">Bloom Circle</h1>
                         <p className="text-xs text-muted-foreground italic">Support for her, awareness for you.</p>
                     </div>
                     {tabs.map((tab) => (
@@ -109,7 +120,7 @@ export default function FamilyPage() {
 
                 <main className="flex-1 w-full max-w-2xl mx-auto md:mx-0">
                     <div className="md:hidden mb-8 text-center pt-4">
-                        <h1 className="font-serif text-3xl font-bold italic text-secondary-foreground">Family Circle</h1>
+                        <h1 className="font-serif text-3xl font-bold italic text-secondary-foreground">Bloom Circle</h1>
                         <p className="text-muted-foreground">Support for her, awareness for you.</p>
                     </div>
 
