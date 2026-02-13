@@ -166,19 +166,23 @@ export function CommunityForum() {
                     </div>
                 </div>
 
-                {/* Post Category Selection */}
+                {/* Post Category Selection & Filter */}
                 <div className="mb-4 flex flex-wrap gap-2">
-                    {CATEGORIES.filter(c => c.id !== "all").map((cat) => (
+                    {CATEGORIES.map((cat) => (
                         <button
                             key={cat.id}
-                            onClick={() => setSelectedCategory(cat.id)}
+                            onClick={() => {
+                                setFilterCategory(cat.id);
+                                if (cat.id !== "all") setSelectedCategory(cat.id);
+                            }}
                             className={cn(
                                 "flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all",
-                                selectedCategory === cat.id
-                                    ? "bg-primary/20 text-primary ring-1 ring-primary/30"
+                                filterCategory === cat.id
+                                    ? "bg-primary text-primary-foreground shadow-md ring-1 ring-primary/30"
                                     : "bg-muted/50 text-muted-foreground hover:bg-muted"
                             )}
                         >
+                            {cat.icon}
                             {cat.label}
                         </button>
                     ))}
@@ -197,7 +201,7 @@ export function CommunityForum() {
                         className="flex items-center gap-2 rounded-2xl bg-primary px-6 py-3 font-bold text-primary-foreground shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50"
                     >
                         <Send className="h-4 w-4" />
-                        Post Anonymously
+                        Post to #{selectedCategory}
                     </button>
                 </div>
             </section>
