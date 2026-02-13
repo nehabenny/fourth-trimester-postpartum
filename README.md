@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bloom: Postpartum AI Support Platform
 
-## Getting Started
+Bloom is a comprehensive digital companion designed to support mothers and their families during the critical fourth trimester. It combines AI-driven health monitoring with an anonymous community space and intelligent alerts.
 
-First, run the development server:
+## 🌟 Key Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Mother Mode
+- **Daily Dashboard**: Personalized check-ins with random supportive affirmations.
+- **Nurse AI Health Vision**: Visual AI analysis of physical symptoms (e.g., C-section healing, breastfeeding concerns) using Gemini Pro Vision.
+- **Anonymous Community Forum**: Safe space to share, like, and reply anonymously to other mothers.
+- **Recovery Tracker**: Comprehensive tool to monitor physical and mental wellbeing.
+- **3AM AI Chat**: A 24/7 AI companion for middle-of-the-night support.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Family Mode
+- **Bloom Circle Dashboard**: Real-time alerts and awareness for support partners.
+- **Smart Alerts**: Logic-driven alerts for physical pain, mood dips, and vital symptoms.
+- **Care Guide & Checklist**: Actionable steps for support partners to help the mother thrive.
+- **SOS Monitoring**: Passive monitoring for silent distress signals.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🏗️ Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Frontend**: [Next.js](https://nextjs.org/) (React, Tailwind CSS, Framer Motion)
+- **Backend**: [Django REST Framework](https://www.django-rest-framework.org/) (SQLite, SimpleJWT)
+- **AI Integration**: [Google Gemini Pro Vision](https://ai.google.dev/) for health analysis and chat.
 
-## Learn More
+## 🚀 Getting Started
 
-To learn more about Next.js, take a look at the following resources:
+### Prerequisites
+- Node.js (v18+)
+- Python (v3.10+)
+- Gemini API Key
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Backend Setup
+1. Navigate to the `backend` directory:
+   ```bash
+   cd backend
+   ```
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate  # Windows
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Run migrations:
+   ```bash
+   python manage.py migrate
+   ```
+5. Start the server:
+   ```bash
+   python manage.py runserver 8000
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Frontend Setup
+1. Navigate to the root directory.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Configure environment variables in `.env.local`:
+   ```bash
+   GEMINI_API_KEY=your_key_here
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000) for Mother Mode or [http://localhost:3000/family](http://localhost:3000/family) for Family Mode.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🔒 Security
+Bloom uses JWT-based authentication to separate Mother and Family access, ensuring privacy and focused support.
