@@ -1,8 +1,7 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenAI, type Content } from "@google/genai";
 import { NextResponse } from "next/server";
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 const SYSTEM_PROMPT = `
 You are the "3AM Companion," an empathetic, warm, and highly supportive AI assistant designed for mothers in the postpartum period. 
@@ -26,20 +25,23 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "API Key not configured" }, { status: 500 });
         }
 
-        const chat = model.startChat({
-            history: chatHistory || [],
-            generationConfig: {
+        // Map history to the correct content format
+        const contents: Content[] = [
+            { role: "user", parts: [{ text: SYSTEM_PROMPT }] },
+            ...(chatHistory || []),
+            { role: "user", parts: [{ text: prompt }] }
+        ];
+
+        const result = await client.models.generateContent({
+            model: "gemini-2.0-flash",
+            contents: contents,
+            config: {
                 maxOutputTokens: 500,
             },
         });
 
-        // We prepend the system prompt instructions to the first message if history is empty
-        // or just use it as part of the overall instruction if the model supports system instructions.
-        // For simplicity in this demo, we'll use it as a part of the context.
-
-        const result = await chat.sendMessage([SYSTEM_PROMPT, prompt]);
-        const response = await result.response;
-        const text = response.text();
+        // Extract text from the new SDK response structure
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "I'm here for you, Mama.";
 
         return NextResponse.json({ text });
     } catch (error: any) {
