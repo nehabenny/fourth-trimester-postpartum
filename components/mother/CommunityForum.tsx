@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Heart, MessageSquare, Send, User, ChevronDown, ChevronUp, Sparkles } from "lucide-react";
+import { Users, Heart, MessageSquare, Send, User, ChevronDown, ChevronUp, Sparkles, Smile, HeartPulse } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -14,15 +14,27 @@ interface Reply {
 interface Post {
     id: string;
     text: string;
+    category: string;
     likes: number;
     replies: Reply[];
     timestamp: string;
     isLiked?: boolean; // Client-side state for the current user
 }
 
+const CATEGORIES = [
+    { id: "all", label: "All Feed", icon: <Users className="h-3 w-3" /> },
+    { id: "selfcare", label: "#selfcare", icon: <Sparkles className="h-3 w-3" /> },
+    { id: "breastfeeding", label: "#breastfeeding", icon: <Heart className="h-3 w-3" /> },
+    { id: "mentalhealth", label: "#mentalhealth", icon: <Smile className="h-3 w-3" /> },
+    { id: "recovery", label: "#recovery", icon: <HeartPulse className="h-3 w-3" /> },
+    { id: "newborn", label: "#newborn", icon: <User className="h-3 w-3" /> },
+];
+
 export function CommunityForum() {
     const [posts, setPosts] = useState<Post[]>([]);
     const [newPost, setNewPost] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("selfcare");
+    const [filterCategory, setFilterCategory] = useState("all");
     const [replyingTo, setReplyingTo] = useState<string | null>(null);
     const [replyText, setReplyText] = useState("");
     const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
@@ -43,6 +55,7 @@ export function CommunityForum() {
                 {
                     id: "1",
                     text: "Just had my first full 4 hours of sleep in 3 weeks. Feeling like a new human! 🌸",
+                    category: "recovery",
                     likes: 12,
                     replies: [
                         { id: "r1", text: "That is such a huge win! So happy for you.", timestamp: new Date().toISOString() }
@@ -52,6 +65,7 @@ export function CommunityForum() {
                 {
                     id: "2",
                     text: "Does anyone else feel guilty for wanting a break? I love my baby but I'm just so tired.",
+                    category: "mentalhealth",
                     likes: 24,
                     replies: [
                         { id: "r2", text: "Every single one of us feels this. You are not alone and you are a great mom.", timestamp: new Date().toISOString() }
@@ -77,6 +91,7 @@ export function CommunityForum() {
         const post: Post = {
             id: Date.now().toString(),
             text: newPost,
+            category: selectedCategory,
             likes: 0,
             replies: [],
             timestamp: new Date().toISOString(),
@@ -85,6 +100,10 @@ export function CommunityForum() {
         savePosts([post, ...posts]);
         setNewPost("");
     };
+
+    const filteredPosts = filterCategory === "all"
+        ? posts
+        : posts.filter(p => p.category === filterCategory);
 
     const handleLike = (postId: string) => {
         const likedIds = JSON.parse(localStorage.getItem("user_liked_posts") || "[]");
@@ -138,12 +157,52 @@ export function CommunityForum() {
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Category Filter Bar */}
+            <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar scroll-smooth">
+                {CATEGORIES.map((cat) => (
+                    <button
+                        key={cat.id}
+                        onClick={() => setFilterCategory(cat.id)}
+                        className={cn(
+                            "flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all",
+                            filterCategory === cat.id
+                                ? "bg-primary text-primary-foreground shadow-md"
+                                : "bg-white border text-muted-foreground hover:bg-muted/50"
+                        )}
+                    >
+                        {cat.icon}
+                        {cat.label}
+                    </button>
+                ))}
+            </div>
+
             {/* Create Post Section */}
             <section className="rounded-3xl border bg-card p-6 shadow-sm ring-1 ring-primary/5">
-                <div className="mb-4 flex items-center gap-2">
-                    <Sparkles className="h-5 w-5 text-primary" />
-                    <h2 className="text-xl font-bold">Share Anonymously</h2>
+                <div className="mb-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                        <Sparkles className="h-5 w-5 text-primary" />
+                        <h2 className="text-xl font-bold">Share Anonymously</h2>
+                    </div>
                 </div>
+
+                {/* Post Category Selection */}
+                <div className="mb-4 flex flex-wrap gap-2">
+                    {CATEGORIES.filter(c => c.id !== "all").map((cat) => (
+                        <button
+                            key={cat.id}
+                            onClick={() => setSelectedCategory(cat.id)}
+                            className={cn(
+                                "flex items-center gap-2 rounded-xl px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all",
+                                selectedCategory === cat.id
+                                    ? "bg-primary/20 text-primary ring-1 ring-primary/30"
+                                    : "bg-muted/50 text-muted-foreground hover:bg-muted"
+                            )}
+                        >
+                            {cat.label}
+                        </button>
+                    ))}
+                </div>
+
                 <textarea
                     value={newPost}
                     onChange={(e) => setNewPost(e.target.value)}
@@ -164,103 +223,114 @@ export function CommunityForum() {
 
             {/* Posts List */}
             <div className="space-y-4">
-                {posts.map((post) => (
-                    <motion.div
-                        layout
-                        key={post.id}
-                        className="rounded-3xl border bg-card p-6 shadow-sm transition-all hover:shadow-md"
-                    >
-                        <div className="mb-4 flex items-start justify-between">
-                            <div className="flex items-center gap-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                    <User className="h-4 w-4" />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Anonymous Bloom</p>
-                                    <p className="text-[10px] text-muted-foreground">{new Date(post.timestamp).toLocaleTimeString()}</p>
+                <AnimatePresence mode="popLayout">
+                    {filteredPosts.map((post) => (
+                        <motion.div
+                            layout
+                            key={post.id}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.95 }}
+                            className="rounded-3xl border bg-card p-6 shadow-sm transition-all hover:shadow-md"
+                        >
+                            <div className="mb-4 flex items-start justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                        <User className="h-4 w-4" />
+                                    </div>
+                                    <div>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Anonymous Bloom</p>
+                                            <span className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+                                            <span className="rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase text-secondary">
+                                                #{post.category}
+                                            </span>
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground">{new Date(post.timestamp).toLocaleTimeString()}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <p className="mb-6 text-sm leading-relaxed text-foreground md:text-base">
-                            {post.text}
-                        </p>
+                            <p className="mb-6 text-sm leading-relaxed text-foreground md:text-base">
+                                {post.text}
+                            </p>
 
-                        <div className="flex items-center gap-6 border-t pt-4">
-                            <button
-                                onClick={() => handleLike(post.id)}
-                                className="flex items-center gap-2 text-xs font-bold text-muted-foreground transition-all hover:text-red-500"
-                            >
-                                <Heart className={cn("h-4 w-4 transition-all", post.isLiked ? "fill-red-500 text-red-500 scale-125" : "text-muted-foreground")} />
-                                {post.likes} {post.likes === 1 ? "Cheer" : "Cheers"}
-                            </button>
-                            <button
-                                onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
-                                className="flex items-center gap-2 text-xs font-bold text-muted-foreground transition-all hover:text-primary"
-                            >
-                                <MessageSquare className="h-4 w-4" />
-                                {post.replies.length} Support
-                            </button>
-                            {post.replies.length > 0 && (
+                            <div className="flex items-center gap-6 border-t pt-4">
                                 <button
-                                    onClick={() => toggleExpand(post.id)}
-                                    className="ml-auto text-muted-foreground transition-all hover:text-foreground"
+                                    onClick={() => handleLike(post.id)}
+                                    className="flex items-center gap-2 text-xs font-bold text-muted-foreground transition-all hover:text-red-500"
                                 >
-                                    {expandedPosts.has(post.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                    <Heart className={cn("h-4 w-4 transition-all", post.isLiked ? "fill-red-500 text-red-500 scale-125" : "text-muted-foreground")} />
+                                    {post.likes} {post.likes === 1 ? "Cheer" : "Cheers"}
                                 </button>
-                            )}
-                        </div>
-
-                        {/* Reply Input */}
-                        <AnimatePresence>
-                            {replyingTo === post.id && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="mt-4 overflow-hidden"
+                                <button
+                                    onClick={() => setReplyingTo(replyingTo === post.id ? null : post.id)}
+                                    className="flex items-center gap-2 text-xs font-bold text-muted-foreground transition-all hover:text-primary"
                                 >
-                                    <div className="flex gap-2">
-                                        <input
-                                            value={replyText}
-                                            onChange={(e) => setReplyText(e.target.value)}
-                                            placeholder="Write a supportive reply..."
-                                            className="flex-1 rounded-xl border-none bg-muted/50 px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20"
-                                        />
-                                        <button
-                                            onClick={() => handleReply(post.id)}
-                                            className="rounded-xl bg-primary px-4 py-2 text-white shadow-sm"
-                                        >
-                                            Reply
-                                        </button>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                                    <MessageSquare className="h-4 w-4" />
+                                    {post.replies.length} Support
+                                </button>
+                                {post.replies.length > 0 && (
+                                    <button
+                                        onClick={() => toggleExpand(post.id)}
+                                        className="ml-auto text-muted-foreground transition-all hover:text-foreground"
+                                    >
+                                        {expandedPosts.has(post.id) ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                                    </button>
+                                )}
+                            </div>
 
-                        {/* Replies List */}
-                        <AnimatePresence>
-                            {expandedPosts.has(post.id) && post.replies.length > 0 && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="mt-4 space-y-3 overflow-hidden border-l-2 border-primary/10 pl-4"
-                                >
-                                    {post.replies.map((reply) => (
-                                        <div key={reply.id} className="rounded-2xl bg-muted/30 p-3">
-                                            <div className="mb-1 flex items-center gap-2">
-                                                <User className="h-3 w-3 text-muted-foreground" />
-                                                <span className="text-[10px] font-bold text-muted-foreground uppercase">Anonymous Bloom</span>
-                                            </div>
-                                            <p className="text-xs leading-relaxed text-foreground/80">{reply.text}</p>
+                            {/* Reply Input */}
+                            <AnimatePresence>
+                                {replyingTo === post.id && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: "auto" }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="mt-4 overflow-hidden"
+                                    >
+                                        <div className="flex gap-2">
+                                            <input
+                                                value={replyText}
+                                                onChange={(e) => setReplyText(e.target.value)}
+                                                placeholder="Write a supportive reply..."
+                                                className="flex-1 rounded-xl border-none bg-muted/50 px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20"
+                                            />
+                                            <button
+                                                onClick={() => handleReply(post.id)}
+                                                className="rounded-xl bg-primary px-4 py-2 text-white shadow-sm"
+                                            >
+                                                Reply
+                                            </button>
                                         </div>
-                                    ))}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.div>
-                ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+
+                            {/* Replies List */}
+                            <AnimatePresence>
+                                {expandedPosts.has(post.id) && post.replies.length > 0 && (
+                                    <motion.div
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: "auto" }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="mt-4 space-y-3 overflow-hidden border-l-2 border-primary/10 pl-4"
+                                    >
+                                        {post.replies.map((reply) => (
+                                            <div key={reply.id} className="rounded-2xl bg-muted/30 p-3">
+                                                <div className="mb-1 flex items-center gap-2">
+                                                    <User className="h-3 w-3 text-muted-foreground" />
+                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Anonymous Bloom</span>
+                                                </div>
+                                                <p className="text-xs leading-relaxed text-foreground/80">{reply.text}</p>
+                                            </div>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    ))}
+                </AnimatePresence>
             </div>
         </div>
     );
