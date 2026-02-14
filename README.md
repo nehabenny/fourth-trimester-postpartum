@@ -42,9 +42,14 @@ Bloom is an AI-first postpartum care platform that bridges the gap between hospi
 
 ## 📸 Screenshots
 
-| Landing Page | Mother's Dashboard | Family Dashboard |
-|---|---|---|
-| ![Landing](docs/screenshots/bloom-landing.png) | ![Mother](docs/screenshots/mother-dashboard.png) | ![Family](docs/screenshots/family-dashboard.png) |
+### Landing Page
+![Landing](docs/screenshots/bloom-landing.png)
+
+### Mother's Dashboard
+![Mother](docs/screenshots/mother-dashboard.png)
+
+### Family Dashboard
+![Family](docs/screenshots/family-dashboard.png)
 
 ---
 
