@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-w)f$vht6@j5ls66b-!^1jh=rmy-^*hlc)-iso--)*0495)q(=$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'fourth-trimester-postpartum.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
 
 
 # Application definition
