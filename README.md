@@ -54,7 +54,7 @@ Bloom is an AI-first postpartum care platform that bridges the gap between hospi
 
 > 📌 *Add your demo video link here after recording.*
 
-🔗 **[Watch Demo Video →](#)** *(Coming Soon)*
+🔗 **[Watch Demo Video →](https://youtu.be/KWoIjRlCsPo)**
 
 ---
 
