@@ -46,7 +46,7 @@ Bloom is an AI-first postpartum care platform that bridges the gap between hospi
 
 | Landing Page | Mother's Dashboard | Family Dashboard |
 |---|---|---|
-| ![Landing](docs/screenshots/landing.png) | ![Mother](docs/screenshots/mother-dashboard.png) | ![Family](docs/screenshots/family-dashboard.png) |
+| ![Landing](docs/screenshots/bloom-landing.png) | ![Mother](docs/screenshots/mother-dashboard.png) | ![Family](docs/screenshots/family-dashboard.png) |
 
 ---
 
@@ -107,7 +107,7 @@ graph TB
 | `/api/nurse-vision` | POST | Nurse AI — multimodal facial analysis |
 | `/api/sentiment` | POST | Sentiment Pulse — mood trend analysis |
 
-📄 **[Full API Docs →](docs/api-docs.md)**
+📄 **[Full API Docs →](docs/api-docs.md)** | 🤖 **[AI Prompts & Tools →](docs/ai-prompts.md)**
 
 ---
 
