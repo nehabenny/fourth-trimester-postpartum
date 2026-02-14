@@ -1,6 +1,13 @@
+/**
+ * 3AM AI Chat Endpoint
+ * Handles multi-turn conversations between the mother and the Gemini AI companion.
+ * Uses system prompts to maintain a warm, empathetic tone appropriate for postpartum care.
+ */
+
 import { GoogleGenAI, type Content } from "@google/genai";
 import { NextResponse } from "next/server";
 
+// Initialize the Google GenAI client with the API key from environment variables
 const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 const SYSTEM_PROMPT = `
@@ -19,6 +26,7 @@ Context: The mother is currently in the "Fourth Trimester" (weeks 1-12 postpartu
 
 export async function POST(req: Request) {
     try {
+        // Extract the user's message and any previous conversation history
         const { prompt, chatHistory } = await req.json();
 
         if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === "your_api_key_here") {
@@ -49,21 +57,28 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ text });
     } catch (error: any) {
-        console.error("Gemini API Error Detail:", error);
+        console.error("--- GEMINI CHAT ERROR TRACE ---");
+        console.error("Status:", error.status);
+        console.error("Message:", error.message);
+        console.error("Raw Error JSON:", JSON.stringify(error, null, 2));
+        console.error("------------------------------");
 
-        const fallback = "The Nurse is taking a 60-second break to check on other patients... You're doing great. Take a deep breath while I process your data.";
+        let status = error.status || 500;
+        let errorMessage = "AI is currently resting";
+        let fallback = `I'm having a little trouble: ${error.message || "Unknown error"}.`;
 
-        // Specific handling for Quota Exceeded
-        if (error.status === 429 || error.message?.includes("RESOURCE_EXHAUSTED")) {
-            return NextResponse.json({
-                error: "Quota Exceeded",
-                text: fallback
-            }, { status: 429 });
+        if (status === 429 || error.message?.includes("RESOURCE_EXHAUSTED")) {
+            errorMessage = "Quota Exceeded (429)";
+            fallback = "I'm taking a 60-second break to check on other patients... You're doing great. Take a deep breath while I process your data.";
         }
 
         return NextResponse.json({
-            error: "AI is currently resting",
-            text: fallback
-        }, { status: 500 });
+            error: errorMessage,
+            text: fallback,
+            debug: {
+                message: error.message,
+                status: error.status
+            }
+        }, { status });
     }
 }

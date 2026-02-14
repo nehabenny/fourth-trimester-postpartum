@@ -1,6 +1,14 @@
+/**
+ * Sentiment Pulse Endpoint
+ * Analyzes the mother's mood journal history using Gemini AI to detect emotional trends,
+ * burnout risk, and suggest interventions for family members. Runs once per session
+ * to conserve API quota.
+ */
+
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
+// Initialize the Google GenAI client
 const client = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 
 const SENTIMENT_PROMPT = `
@@ -25,8 +33,11 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No history provided" }, { status: 400 });
         }
 
+        // Format the mood history into a readable prompt for Gemini
         const promptText = `Journal History:\n${history.map((h: any) => `- [${h.timestamp}] ${h.note}`).join("\n")}`;
         const contents = [{ role: "user", parts: [{ text: promptText }] }];
+
+        // Send to Gemini with JSON response mode for structured output
 
         const result = await client.models.generateContent({
             model: "gemini-2.5-flash",
@@ -40,7 +51,26 @@ export async function POST(req: Request) {
         const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
         return NextResponse.json(JSON.parse(text));
     } catch (error: any) {
-        console.error("Sentiment API Error:", error);
-        return NextResponse.json({ error: "Failed to analyze sentiment" }, { status: 500 });
+        console.error("--- SENTIMENT ANALYSIS ERROR TRACE ---");
+        console.error("Status:", error.status);
+        console.error("Message:", error.message);
+        console.error("Raw Error JSON:", JSON.stringify(error, null, 2));
+        console.error("--------------------------------------");
+
+        let status = error.status || 500;
+        let errorMessage = "Sentiment check failed";
+
+        if (status === 429 || error.message?.includes("RESOURCE_EXHAUSTED")) {
+            errorMessage = "Quota Exceeded (429)";
+        }
+
+        return NextResponse.json({
+            error: errorMessage,
+            sentiment: "stable",
+            debug: {
+                message: error.message,
+                status: error.status
+            }
+        }, { status });
     }
 }

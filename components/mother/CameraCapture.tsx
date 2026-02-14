@@ -87,7 +87,7 @@ export function CameraCapture() {
             </h2>
 
             <p className="mb-6 text-sm text-muted-foreground">
-                Snap a photo of your meal or yourself. Our AI nurse will check your nutrition or signs of fatigue.
+                Snap a photo of your meal or yourself. Our AI nurse will check your nutrition or signs of fatigue (eyes, skin tone, expression).
             </p>
 
             <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-muted/30 border-2 border-dashed border-muted">
@@ -102,8 +102,12 @@ export function CameraCapture() {
                 ) : previewImage ? (
                     <img src={previewImage} alt="Preview" className="h-full w-full object-cover" />
                 ) : (
-                    <div className="flex h-full flex-col items-center justify-center gap-4">
+                    <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
                         <Camera className="h-12 w-12 text-muted-foreground/50" />
+                        <div>
+                            <p className="text-sm font-medium mb-1">For Fatigue Check:</p>
+                            <p className="text-xs text-muted-foreground">Ensure your face is well-lit and clearly visible.</p>
+                        </div>
                         <button
                             onClick={startCamera}
                             className="rounded-full bg-primary px-6 py-2 text-sm font-bold text-primary-foreground shadow-lg transition-all hover:scale-105"

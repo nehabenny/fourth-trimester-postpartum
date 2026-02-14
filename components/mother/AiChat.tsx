@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * AiChat — 3AM AI Companion Component
+ * Provides a chat interface for late-night postpartum support.
+ * Sends messages to /api/gemini and maintains conversation history.
+ * Includes specific error handling for quota limits and API configuration issues.
+ */
+
 import { useState, useRef, useEffect } from "react";
 import { Send, User, Bot, X, Sparkles, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -45,9 +52,15 @@ export function AiChat({ onClose }: { onClose?: () => void }) {
             if (response.ok && data.text) {
                 setMessages((prev) => [...prev, { role: "model", parts: [{ text: data.text }] }]);
             } else {
-                const errorMsg = data.error === "API Key not configured"
-                    ? "Mama, it looks like the AI companion needs its key (API Key) to wake up. Check the .env.local file."
-                    : (data.message || "I'm having a little trouble connecting right now, Mama.");
+                let errorMsg = "I'm having a little trouble connecting right now, Mama.";
+
+                if (data.error === "API Key not configured") {
+                    errorMsg = "Mama, it looks like the AI companion needs its key (API Key) to wake up. Check the .env.local file.";
+                } else if (data.error?.includes("Quota")) {
+                    errorMsg = "I'm taking a little rest right now (Quota Exceeded). I'll be back soon to listen, Mama.";
+                } else if (data.debug) {
+                    errorMsg = `I'm having a little trouble: ${data.debug}`;
+                }
 
                 setMessages((prev) => [...prev, { role: "model", parts: [{ text: errorMsg }] }]);
             }

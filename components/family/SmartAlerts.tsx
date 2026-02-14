@@ -1,5 +1,12 @@
 "use client";
 
+/**
+ * SmartAlerts — Family Dashboard Alert Engine
+ * Analyzes the mother's daily logs, breathing data, and Nurse AI results to generate
+ * logic-driven alerts (Silent SOS, Mood Dips, Physical Concerns) for family members.
+ * Includes a session-based throttle to prevent redundant background AI calls.
+ */
+
 import { useState, useEffect } from "react";
 import { AlertCircle, AlertTriangle, CheckCircle, Info, Heart, Sparkles, Wind, Camera, HeartPulse } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,6 +18,7 @@ export function SmartAlerts() {
     const [mentalScore, setMentalScore] = useState<number | null>(null);
     const [sentimentPulse, setSentimentPulse] = useState<any>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [lastAnalysisFailed, setLastAnalysisFailed] = useState(false);
     const [isBreathing, setIsBreathing] = useState(false);
     const [nurseLog, setNurseLog] = useState<any>(null);
 
@@ -28,7 +36,10 @@ export function SmartAlerts() {
                 if (mental) setMentalScore(parseInt(mental));
                 setIsBreathing(breathing === "true");
 
-                if (history && !sentimentPulse && !isAnalyzing) {
+                // ONLY analyze if we haven't tried in this session load
+                const sessionTried = sessionStorage.getItem("sentiment_tried");
+                if (history && !sentimentPulse && !isAnalyzing && !lastAnalysisFailed && !sessionTried) {
+                    sessionStorage.setItem("sentiment_tried", "true");
                     analyzeSentiment(JSON.parse(history));
                 }
             } catch (e) {
@@ -49,14 +60,15 @@ export function SmartAlerts() {
             }
         };
 
+        // Primary sync for data changes
         updateStates();
         fetchNurseLogs();
 
-        // Sync every 3 seconds to catch changes in the same tab or other tabs
+        // Sync every 60 seconds for non-AI data (protects quota)
         const interval = setInterval(() => {
             updateStates();
             fetchNurseLogs();
-        }, 3000);
+        }, 60000);
 
         window.addEventListener("storage", updateStates);
         return () => {
@@ -76,9 +88,13 @@ export function SmartAlerts() {
             const data = await res.json();
             if (data && !data.error) {
                 setSentimentPulse(data);
+                setLastAnalysisFailed(false);
+            } else {
+                setLastAnalysisFailed(true);
             }
         } catch (e) {
             console.error("Failed to analyze sentiment", e);
+            setLastAnalysisFailed(true);
         } finally {
             setIsAnalyzing(false);
         }
