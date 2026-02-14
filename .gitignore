@@ -47,3 +47,11 @@ __pycache__/
 *$py.class
 backend/db.sqlite3
 .python-version
+
+# diagnostic scripts
+*-diag.cjs
+*_diag.json
+test-*.cjs
+test-*.mjs
+run-diag.cjs
+list-models.cjs
